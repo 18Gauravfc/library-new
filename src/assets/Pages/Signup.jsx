@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // ✅ Import Link
+import { Link } from 'react-router-dom';
 import Header from '../../Component/Header';
 import { Footer } from '../../Component/Footer';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Signup = () => {
   const [form, setForm] = useState({
@@ -10,19 +11,47 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
   });
+console.log("form data is", form.password == form.confirmPassword)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
+
+    if (form.password != form.confirmPassword ) {
       alert('Passwords do not match!');
       return;
     }
-    alert('Signup successful!');
-    console.log(form);
+
+    try {
+      const response = await fetch('https://ticket-booking-1uxh.onrender.com/api/v1/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: form.name,
+          email: form.email,
+          password: form.password,
+          confirmPassword:form.confirmPassword
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Signup successful!');
+        console.log('API response:', data);
+        window.location.href = '/login';
+      } else {
+        alert(`Signup failed: ${data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again later.');
+    }
   };
 
   return (
@@ -33,7 +62,7 @@ const Signup = () => {
           <h2 className="text-2xl font-bold text-center text-green-700 mb-6">Create Your Account</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700 lex-grow flex items-start justify-start">Full Name</label>
+              <label className="block mb-1 text-sm font-medium text-gray-700 text-left">Full Name</label>
               <input
                 type="text"
                 name="name"
@@ -45,7 +74,7 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700 lex-grow flex items-start justify-start">Email Address</label>
+              <label className="block mb-1 text-sm font-medium text-gray-700 text-left">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -57,33 +86,48 @@ const Signup = () => {
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700 lex-grow flex items-start justify-start">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-              />
+              <label className="block mb-1 text-sm font-medium text-gray-700 text-left">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 pr-10 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-600 cursor-pointer"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700 lex-grow flex items-start justify-start">Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-              />
+              <label className="block mb-1 text-sm font-medium text-gray-700 text-left">Confirm Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 pr-10 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                <span
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-600 cursor-pointer"
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-            >
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
               Sign Up
             </button>
           </form>
