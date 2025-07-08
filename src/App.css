@@ -1,0 +1,164 @@
+#root {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+.container-box {
+  background-color: #5dcfff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Add Ticket and Group Button */
+.btn-add {
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-add:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+.btn-group {
+  background-color: #16a34a; /* green-600 */
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-group:hover {
+  background-color: #15803d; /* green-700 */
+}
+
+/* Ticket Styles */
+.ticket {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background-color: orange;
+  color: white;
+  text-align: center;
+  line-height: 30px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+}
+
+.ticket.group-ticket {
+  background-color: orangered !important;
+}
+
+.ticket .remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Seat Styles */
+.seat {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 5px;
+  border-radius: 4px;
+  text-align: center;
+  color: white;
+  padding-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.seat.occupied {
+  background-color: red;
+}
+
+.seat.locked {
+  background-color: darkred;
+  pointer-events: none;
+}
+
+.seat .ticket-label {
+  margin-top: 5px;
+  display: block;
+  font-weight: bold;
+  cursor: grab;
+}
+
+.seat .remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Confirm Button */
+.btn-confirm {
+  background-color: #dc2626; /* red-600 */
+  color: white;
+  padding: 4px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-confirm:hover {
+  background-color: #b91c1c; /* red-700 */
+}
+.d-flex{
+      display: flex;
+}
+.seat.dropped {
+  background-color: #b91c1c !important;
+}
