@@ -9,7 +9,7 @@ import { FaCalendarAlt, FaLandmark } from 'react-icons/fa';
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState('');
-  const [selected Hall, setSelected Hall] = useState('A');
+  const [selectedHall, setSelectedHall] = useState('A');
   const [tickets, setTickets] = useState([]);
   const [seatsMap, setSeatsMap] = useState({
     A: Array(30).fill({ ticket: '', locked: false }),
@@ -20,10 +20,10 @@ export default function Home() {
   const [groupedTickets, setGroupedTickets] = useState([]);
   const [ticketAssignments, setTicketAssignments] = useState({});
 
-  const seats = seatsMap[selected Hall];
+  const seats = seatsMap[selectedHall];
 
   const updateSeats = (newSeats) => {
-    setSeatsMap(prev => ({ ...prev, [selected Hall]: newSeats }));
+    setSeatsMap(prev => ({ ...prev, [selectedHall]: newSeats }));
   };
 
   const addTicket = () => {
@@ -66,7 +66,7 @@ export default function Home() {
     if (updated[index].ticket) restoreTicket(updated[index].ticket);
     updated[index] = { ...updated[index], ticket: ticketText };
     updateSeats(updated);
-    setTicketAssignments(prev => ({ ...prev, [ticketText]: `${selected Hall}-${index + 1}` }));
+    setTicketAssignments(prev => ({ ...prev, [ticketText]: `${selectedHall}-${index + 1}` }));
     setTickets(tickets.filter(t => t !== ticketText));
     setGroupedTickets(groupedTickets.filter(t => t !== ticketText));
   };
@@ -82,7 +82,7 @@ export default function Home() {
       updateSeats(updated);
       const newAssignments = { ...ticketAssignments };
       group.forEach((t, i) => {
-        newAssignments[t] = `${selected Hall}-${start + i + 1}`;
+        newAssignments[t] = `${selectedHall}-${start + i + 1}`;
       });
       setTicketAssignments(newAssignments);
       setTickets(tickets.filter(t => !group.includes(t)));
@@ -102,7 +102,7 @@ export default function Home() {
         updateSeats(updated);
         const newAssignments = { ...ticketAssignments };
         group.forEach((t, i) => {
-          newAssignments[t] = `${selected Hall}-${leftStart + i + 1}`;
+          newAssignments[t] = `${selectedHall}-${leftStart + i + 1}`;
         });
         setTicketAssignments(newAssignments);
         setTickets(tickets.filter(t => !group.includes(t)));
@@ -165,15 +165,15 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="text-gray-700 font-semibold flex items-center gap-2  mb-1">  <FaLandmark className="text-gray-600" /> Select  Hall</label>
+              <label className="text-gray-700 font-semibold flex items-center gap-2  mb-1">  <FaLandmark className="text-gray-600" /> Select Hall</label>
               <select
-                value={selected Hall}
-                onChange={e => setSelected Hall(e.target.value)}
+                value={selectedHall}
+                onChange={e => setSelectedHall(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 shadow focus:ring-2 focus:ring-red-300"
               >
-                <option value="A"> Hall A</option>
-                <option value="B"> Hall B</option>
-                <option value="C"> Hall C</option>
+                <option value="A">Hall A</option>
+                <option value="B">Hall B</option>
+                <option value="C">Hall C</option>
               </select>
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function Home() {
           </div>
 
           {/* 💺 Seat Map */}
-          <h5 className="text-xl font-bold mb-2">Available Seats -  Hall {selected Hall}</h5>
+          <h5 className="text-xl font-bold mb-2">Available Seats - Hall {selectedHall}</h5>
           <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 mb-6">
             {seats.map((seat, i) => (
               <div key={i}
