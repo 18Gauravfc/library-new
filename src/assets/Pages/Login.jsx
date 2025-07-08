@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../Component/Header';
 import { Footer } from '../../Component/Footer';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // 👈 Import icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 👈 State to toggle
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

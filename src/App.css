@@ -162,3 +162,30 @@
 .seat.dropped {
   background-color: #b91c1c !important;
 }
+.react-datepicker {
+  border-radius: 1rem;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+}
+
+.react-datepicker__header {
+  background-color: #fef3c7;
+  border-bottom: none;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #f87171 !important;
+  color: white !important;
+  border-radius: 0.5rem;
+}
+
+.react-datepicker__day:hover {
+  background-color: #fca5a5;
+  border-radius: 0.5rem;
+}
+.date-layout .react-datepicker-wrapper{
+  width: 100%;
+}

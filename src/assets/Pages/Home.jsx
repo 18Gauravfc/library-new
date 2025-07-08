@@ -1,13 +1,30 @@
 import React, { useState } from 'react';
 import Header from '../../Component/Header';
 import { Footer } from '../../Component/Footer';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { FaCalendarAlt, FaLandmark } from 'react-icons/fa';
+
+
 
 export default function Home() {
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedHole, setSelectedHole] = useState('A');
   const [tickets, setTickets] = useState([]);
-  const [seats, setSeats] = useState(Array(30).fill({ ticket: '', locked: false }));
+  const [seatsMap, setSeatsMap] = useState({
+    A: Array(30).fill({ ticket: '', locked: false }),
+    B: Array(30).fill({ ticket: '', locked: false }),
+    C: Array(30).fill({ ticket: '', locked: false })
+  });
   const [groupMode, setGroupMode] = useState(false);
   const [groupedTickets, setGroupedTickets] = useState([]);
   const [ticketAssignments, setTicketAssignments] = useState({});
+
+  const seats = seatsMap[selectedHole];
+
+  const updateSeats = (newSeats) => {
+    setSeatsMap(prev => ({ ...prev, [selectedHole]: newSeats }));
+  };
 
   const addTicket = () => {
     const confirmed = seats.filter(s => s.ticket.startsWith('T-')).map(s => parseInt(s.ticket.replace('T-', '')));
@@ -35,7 +52,6 @@ export default function Home() {
 
   const handleDrop = (index, ticketText) => {
     if (seats[index].locked) return alert('Seat locked!');
-
     if (ticketText.startsWith('GROUP:')) {
       const group = ticketText.replace('GROUP:', '').split(',');
       assignGroupedTickets(group, index);
@@ -46,38 +62,29 @@ export default function Home() {
 
   const assignSingleTicket = (ticketText, index) => {
     if (seats[index].locked) return;
-
     const updated = [...seats];
-
-    if (seats[index].ticket) {
-      restoreTicket(seats[index].ticket);
-    }
-
+    if (updated[index].ticket) restoreTicket(updated[index].ticket);
     updated[index] = { ...updated[index], ticket: ticketText };
-    setSeats(updated);
-
-    setTicketAssignments(prev => ({ ...prev, [ticketText]: index + 1 }));
+    updateSeats(updated);
+    setTicketAssignments(prev => ({ ...prev, [ticketText]: `${selectedHole}-${index + 1}` }));
     setTickets(tickets.filter(t => t !== ticketText));
     setGroupedTickets(groupedTickets.filter(t => t !== ticketText));
   };
 
   const assignGroupedTickets = (group, start) => {
     const right = seats.slice(start, start + group.length);
-
     if (right.every(s => !s.locked && !s.ticket) && right.length === group.length) {
       const updated = [...seats];
       group.forEach((t, i) => {
         if (updated[start + i].ticket) restoreTicket(updated[start + i].ticket);
         updated[start + i] = { ...updated[start + i], ticket: t };
       });
-      setSeats(updated);
-
+      updateSeats(updated);
       const newAssignments = { ...ticketAssignments };
       group.forEach((t, i) => {
-        newAssignments[t] = start + i + 1;
+        newAssignments[t] = `${selectedHole}-${start + i + 1}`;
       });
       setTicketAssignments(newAssignments);
-
       setTickets(tickets.filter(t => !group.includes(t)));
       resetGroup();
       return;
@@ -92,14 +99,12 @@ export default function Home() {
           if (updated[leftStart + i].ticket) restoreTicket(updated[leftStart + i].ticket);
           updated[leftStart + i] = { ...updated[leftStart + i], ticket: t };
         });
-        setSeats(updated);
-
+        updateSeats(updated);
         const newAssignments = { ...ticketAssignments };
         group.forEach((t, i) => {
-          newAssignments[t] = leftStart + i + 1;
+          newAssignments[t] = `${selectedHole}-${leftStart + i + 1}`;
         });
         setTicketAssignments(newAssignments);
-
         setTickets(tickets.filter(t => !group.includes(t)));
         resetGroup();
         return;
@@ -110,7 +115,7 @@ export default function Home() {
   };
 
   const confirmSeats = () => {
-    setSeats(seats.map(s => s.ticket ? { ...s, locked: true } : s));
+    updateSeats(seats.map(s => s.ticket ? { ...s, locked: true } : s));
     alert('Seats confirmed.');
   };
 
@@ -125,7 +130,7 @@ export default function Home() {
     const ticketText = seats[index].ticket;
     const updated = [...seats];
     updated[index] = { ...updated[index], ticket: '' };
-    setSeats(updated);
+    updateSeats(updated);
     restoreTicket(ticketText);
     setTicketAssignments(prev => {
       const updatedAssignments = { ...prev };
@@ -135,30 +140,71 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-green-200 to-red-200 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-red-100">
       <Header />
-      <div className="container mx-auto mt-16">
-        <div className="bg-white p-4 rounded shadow">
-          <div className="flex gap-2 mb-4">
-            <button onClick={addTicket} className="bg-orange-500 text-white px-4 py-2 rounded">Add Ticket +</button>
-            <button onClick={handleGroup} className="bg-green-600 text-white px-4 py-2 rounded">Group All Tickets</button>
+      <div className="container mx-auto pt-24 px-4">
+        <div className="bg-white p-6 rounded-2xl shadow-2xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div>
+             <label className=" text-gray-700 font-semibold mb-1 flex items-center gap-2">
+                <FaCalendarAlt className="text-gray-600" /> Select Date
+              </label>
+              <div className="relative date-layout">
+                <DatePicker
+                  selected={selectedDate ? new Date(selectedDate) : null}
+                  onChange={date => setSelectedDate(date.toISOString().split('T')[0])}
+                  dateFormat="yyyy-MM-dd"
+                  minDate={new Date()}
+                  placeholderText="Select a date"
+                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500 transition"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <FaCalendarAlt />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-gray-700 font-semibold flex items-center gap-2  mb-1">  <FaLandmark className="text-gray-600" /> Select Hole</label>
+              <select
+                value={selectedHole}
+                onChange={e => setSelectedHole(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 shadow focus:ring-2 focus:ring-red-300"
+              >
+                <option value="A">Hole A</option>
+                <option value="B">Hole B</option>
+                <option value="C">Hole C</option>
+              </select>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex gap-4 mb-6">
+            <button onClick={addTicket} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg shadow transition">Add Ticket +</button>
+            <button onClick={handleGroup} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow transition">Group All Tickets</button>
+          </div>
+
+          <div className="flex flex-wrap gap-3 mb-6">
             {tickets.map(ticket => (
               <div key={ticket} draggable
-                className={`p-2 rounded text-white cursor-grab ${groupMode && groupedTickets.includes(ticket) ? 'bg-red-600' : 'bg-orange-500'}`}
-                onDragStart={e => e.dataTransfer.setData('text/plain', groupMode && groupedTickets.length > 1 ? 'GROUP:' + groupedTickets.join(',') : ticket)}>
+                className={`px-3 py-2 rounded-lg shadow text-white text-sm font-semibold cursor-grab transition-all ${
+                  groupMode && groupedTickets.includes(ticket) ? 'bg-red-600' : 'bg-orange-500'
+                }`}
+                onDragStart={e =>
+                  e.dataTransfer.setData('text/plain', groupMode && groupedTickets.length > 1
+                    ? 'GROUP:' + groupedTickets.join(',') : ticket)}>
                 {ticket}
               </div>
             ))}
           </div>
 
-          <h5 className="text-lg font-bold mb-2">Available Seats</h5>
-          <div className="flex flex-wrap gap-2">
+          {/* 💺 Seat Map */}
+          <h5 className="text-xl font-bold mb-2">Available Seats - Hole {selectedHole}</h5>
+          <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-3 mb-6">
             {seats.map((seat, i) => (
               <div key={i}
-                className={`w-20 h-20 flex flex-col justify-center items-center rounded text-white relative ${seat.locked ? 'bg-red-800' : seat.ticket ? 'bg-red-500' : 'bg-green-500'}`}
+                className={`h-20 flex flex-col justify-center items-center rounded-xl text-white font-semibold transition-all duration-200 relative shadow cursor-pointer ${
+                  seat.locked ? 'bg-red-800' : seat.ticket ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
+                }`}
                 onDragOver={e => !seat.locked && e.preventDefault()}
                 onDrop={e => handleDrop(i, e.dataTransfer.getData('text/plain'))}
                 draggable={!seat.locked && seat.ticket}
@@ -167,7 +213,7 @@ export default function Home() {
                     e.dataTransfer.setData('text/plain', seat.ticket);
                     const updated = [...seats];
                     updated[i] = { ...updated[i], ticket: '' };
-                    setSeats(updated);
+                    updateSeats(updated);
                     restoreTicket(seat.ticket);
                     setTicketAssignments(prev => {
                       const updatedAssignments = { ...prev };
@@ -178,10 +224,10 @@ export default function Home() {
                 }}>
                 <div>Seat {i + 1}</div>
                 {seat.ticket && (
-                  <div className="mt-1 flex items-center">
+                  <div className="mt-1 flex items-center text-xs">
                     {seat.ticket}
                     {!seat.locked && (
-                      <button className="ml-1 bg-red-600 text-white w-4 h-4 flex items-center justify-center rounded" onClick={() => removeFromSeat(i)}>×</button>
+                      <button className="ml-2 bg-red-600 hover:bg-red-700 w-5 h-5 text-sm flex items-center justify-center rounded-full" onClick={() => removeFromSeat(i)}>×</button>
                     )}
                   </div>
                 )}
@@ -189,7 +235,11 @@ export default function Home() {
             ))}
           </div>
 
-          <button onClick={confirmSeats} className="mt-4 bg-red-700 text-white px-4 py-2 rounded">Confirm All Seats</button>
+          <div className="text-center">
+            <button onClick={confirmSeats} className="bg-red-700 hover:bg-red-800 text-white px-6 py-2 rounded-lg shadow-lg transition">
+              Confirm All Seats
+            </button>
+          </div>
         </div>
       </div>
       <Footer />

@@ -6,9 +6,8 @@ export default function Header() {
   const [userName, setUserName] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Watch for route changes
+  const location = useLocation(); 
 console.log('the user name is', userName)
-  // 🔄 Update userName whenever route or localStorage changes
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
     console.log("the stored name", storedName)
